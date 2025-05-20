@@ -1,18 +1,50 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from userauths.models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django_countries.widgets import CountrySelectWidget
+from allauth.account import forms as login_form
 from django.core.exceptions import ValidationError
 
-class UserRegisterForm(UserCreationForm):
-	username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username', 'class': 'username-validation'}))
-	email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}))
-	password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
-	password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}))
+User = get_user_model()
 
-	class Meta:
+
+class UserUpdateForm(UserChangeForm):
+    featured_img = forms.ImageField(required=False)
+    class Meta:
+        model = User
+        fields = (
+                  'email',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'country',
+                  'featured_img',
+                  'gender',
+                  )
+        exclude = ['password']
+
+    
+    # def save(self, *args, **kwargs):
+    #     profile = super().save(commit=False)
+    #     post_save.disconnect(update_user_profile, sender=Profile)
+    #     profile.save()
+    #     post_save.connect(update_user_profile, sender=Profile)
+        
+    
+class UserCreateForm(UserCreationForm):
+	class Meta(UserCreationForm):
 		model = User
-		fields = ['username', 'email']
-
+		fields = (
+					'email',
+					'username',
+					'first_name',
+					'last_name',
+					'country',
+					'featured_img',
+					'gender',
+				)
+		widgets = {'country': CountrySelectWidget()}
+    
 	def clean_username(self):
 		username = self.cleaned_data['username']
 
@@ -23,3 +55,20 @@ class UserRegisterForm(UserCreationForm):
 			raise ValidationError("Username must be between 3 and 12 characters.")
 			
 		return username
+        
+class UserLoginForm(login_form.LoginForm):
+    class Meta:
+        def __init__(self):
+            super(login_form.LoginForm, self).__init__()
+            for field in self.fields:
+                field.update({'class': 'form-control'})
+        
+
+class UserPasswordResetForm(forms.ModelForm):
+    confirm_password = forms.PasswordInput(attrs={'placeholder': 'Confirm password'})
+    class Meta:
+        model = User
+        fields = ('password',)
+        widgets = {'password': forms.PasswordInput(attrs={'placeholder': 'New password'})}
+        
+        

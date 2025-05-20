@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Thirt Party
+     'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+     'allauth.socialaccount.providers.google',
+      'allauth.socialaccount.providers.facebook',
     'taggit',
     'ckeditor',
     'easyaudit',
@@ -63,6 +68,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
+    # Account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'ecomproject.urls'
@@ -70,7 +77,9 @@ ROOT_URLCONF = 'ecomproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS':[os.path.join(BASE_DIR , 'templates'),
+                 os.path.join(BASE_DIR, 'templates', 'allauth'),
+                ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,6 +105,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'blog',
+    #     'USER': os.getenv('USER', ''),
+    #     'PASSWORD': os.getenv('PostgresSuperuserPassword', ''),
+    #     'HOST': 'localhost',
+    #     'PORT': '5433',
+    # }
 }
 
 
@@ -164,9 +182,72 @@ JAZZMIN_SETTINGS = {
     ],
 }
 
-LOGIN_URL = 'userauths:sing-in'
+from django.urls import reverse_lazy
 
+# All auth
+LOGIN_URL = reverse_lazy('userauths:sign-in')
+LOGOUT_REDIRECT_URL = reverse_lazy('userauths:sign-in')
+LOGIN_REDIRECT_URL = reverse_lazy('core:index')
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = ['email']
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 AUTH_USER_MODEL = 'userauths.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    "allauth.account.auth_backends.AuthenticationBackend",
+    ]
+
+# Social LOGIN
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.getenv("Google_OAUTH_CLIENT_ID", ''),
+            "secret": os.getenv("Google_OAUTH_SECRET", ''),
+        },
+        'SCOPE': [
+                'profile',
+                'email',
+            ],
+            'AUTH_PARAMS': {
+                'access_type': 'online',
+            },
+            "OAUTH_PKCE_ENABLED": True,
+    },
+    "facebook": {
+        "APP": {
+            "client_id": os.getenv("Facebook_OAUTH_CLIENT_ID"),
+            "secret": os.getenv("Facebook_OAUTH_SECRET"),
+        },
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "public_profile"],
+        "AUTH_PARAMS": {"auth_type": "reauthenticate"},
+        "FIELDS": ["id", "email", "name", "first_name", "last_name"],
+        "VERSION": "v19.0",  
+    }
+}
+
+#Sign up with a socialAccount 
+SOCIALACCOUNT_QUERY_EMAIL = "email" in ACCOUNT_SIGNUP_FIELDS
+
+# Allow user to sign up with a social account in SOCIALACCOUNT_ADAPTER
+ACCOUNT_ALLOW_SIGNUPS = True
+
+# Adapters
+SOCIALACCOUNT_ADAPTER = 'userauths.adapters.CustomSocialAccountAdapter' 
+ACCOUNT_ADAPTER = "userauths.adapters.MyLoginAccountAdapter"
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+# SOCIALACCOUNT_EMAIL_REQUIRED = False
+   
+   
+# Email sending credentials
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = config('EMAIL_PORT')
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 

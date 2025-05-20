@@ -77,12 +77,12 @@ def product_detail_view(request, pid):
 	average_rating = ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
 	review_form = ProductReviewFrom()
 
-	make_review = True
+	allow_add_review = True
 	if request.user.is_authenticated:
 		user_review_count = ProductReview.objects.filter(user=request.user, product=product).count() 
 
 		if user_review_count > 0:
-			make_review = False
+			allow_add_review = False
 
 	context = {
 		'product': product,
@@ -91,7 +91,7 @@ def product_detail_view(request, pid):
 		'reviews': reviews,
 		'average_rating': average_rating,
 		'review_form': review_form,
-		'make_review': make_review,
+		'allow_add_review': allow_add_review,
 	}
 	return render(request, 'core/product-detail.html', context)
 
@@ -114,7 +114,7 @@ def tags_list(request, tag_slug=None):
 def ajax_add_review(request, pid):
 	product = Product.objects.get(pk=pid)
 	user = request.user
-	image = user.image.url
+	image = user.imageURL
 
 	review = ProductReview.objects.create(
 		user=user,

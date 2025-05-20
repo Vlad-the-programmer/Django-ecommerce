@@ -1,0 +1,72 @@
+{% extends '../base.html' %}
+ {% load socialaccount%} 
+{% block content %}
+{% comment %} <section class="section-conten padding-y" style="min-height: 84vh"> {% endcomment %}
+  <!-- ============================ COMPONENT LOGIN   ================================= -->
+
+  {% if request.GET.command == 'verification' %}
+
+  <div
+    class="container mx-auto alert alert-info text-center"
+    role="alert"
+    style="max-width: 1024px; margin-top: 100px"
+  >
+    Thank you for registering with us. We have sent you a verification email to
+    your email address [{{ request.GET.email }}]
+    <br /><br />
+    Already verified? <a href="{% url 'login' %}">Login</a>
+  </div>
+
+  {% else %}
+
+<div class="auth_wrapper">
+  <header class="auth_header">Sing in</header>
+  <form method="POST" class="auth_form">
+    {% csrf_token %}
+    <div class="field email">
+      <div class="input-area">
+        <input type="text" required name="login" placeholder="Email Address" />
+        <i class="icon fas fa-envelope"></i>
+        {% if messages %}
+        <i class="error error-icon fas fa-exclamation-circle"></i>
+        {% endif %}
+      </div>
+      {% if messages %} 
+      {% for message in messages %}
+      <div class="error error-txt">
+        <strong>{{ message }}</strong>
+      </div>
+      {% endfor %} 
+      {% endif %}
+    </div>
+    <div class="field password">
+      <div class="input-area">
+        <input
+          type="password"
+          required
+          name="password"
+          placeholder="Password"
+        />
+        <i class="icon fas fa-lock"></i>
+        <!-- <i class="error error-icon fas fa-exclamation-circle"></i> -->
+      </div>
+      <!-- <div class="error error-txt">Password can't be blank</div> -->
+    </div>
+     <div class="field remember">
+    <label>
+      <input type="checkbox" name="remember" /> Remember Me
+    </label>
+  </div>
+    <div class="pass-txt"><a href="#">Forgot password?</a></div>
+    <input type="submit" value="Sing in" />
+  </form>
+  <h3>Login with:</h3>
+  <a href="{% provider_login_url 'google' %}">Google</a>
+  <a href="{% provider_login_url 'facebook' %}">Facebook</a>
+  <div class="sign-txt">
+    Not yet member?
+    <a href="{% url 'userauths:sign-up' %}">Sign up now</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -31,7 +31,7 @@ def blog_detail_view(request, pid):
 
 	comment_form = CommentFrom()
 
-	make_comment = True
+	allow_make_comments = True
 	if request.user.is_authenticated:
 		user_comment_count = Comment.objects.filter(
 			user=request.user, 
@@ -39,13 +39,13 @@ def blog_detail_view(request, pid):
 		).count() 
 
 		if user_comment_count > 0:
-			make_comment = False
+			allow_make_comments = False
 
 	context = {
 		"post": post,
 		"comments": comments,
 		"comment_form": comment_form,
-		"make_comment": make_comment,
+		"allow_make_comments": allow_make_comments,
 		"posts": posts,
 	}
 	return render(request, 'blog/blog-detail.html', context)
@@ -67,7 +67,7 @@ def blog_tags(request, tag_slug=None):
 def ajax_add_comment(request, pid):
 	post = Post.objects.get(pk=pid)
 	user = request.user
-	image = user.image.url
+	image = user.imageURL
 
 	comment = Comment.objects.create(
 		user=user,

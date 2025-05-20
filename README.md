@@ -99,5 +99,7 @@ python manage.py createsuperuser
 ```
 python manage.py
 ```
-
+Admin:
+admin@gmail.com
+Password- Student@123
 *happy coding*
