@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
-from decouple import config
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,10 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', True)
 
-# ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition
 
@@ -52,10 +51,16 @@ INSTALLED_APPS = [
     'ckeditor',
     'easyaudit',
 
+    # Celery
+    'django_celery_results',
+    'django_celery_beat',
+    
     # Custom Apps
     'core',
     'userauths',
     'blog',
+    'order',
+    'wishlist',
 ]
 
 MIDDLEWARE = [
@@ -101,19 +106,23 @@ WSGI_APPLICATION = 'ecomproject.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-    
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'blog',
-    #     'USER': os.getenv('USER', ''),
-    #     'PASSWORD': os.getenv('PostgresSuperuserPassword', ''),
-    #     'HOST': 'localhost',
-    #     'PORT': '5433',
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
+   'default': {
+    'ENGINE': config('SQL_ENGINE', default='django.db.backends.postgresql'),
+    'NAME': config('SQL_DATABASE', default='postgres'),
+    'USER': config('SQL_USER', default='postgres'),
+    'PASSWORD': config('SQL_PASSWORD', default=''),
+    'HOST': config('SQL_HOST', default='db'),  # 'db' = Docker service name
+    'PORT': config('SQL_PORT', default='5432'),
+    'OPTIONS': {
+        'sslmode': config('DB_SSL_MODE', default='prefer'),
+        'connect_timeout': 5,
+    },
+    'CONN_MAX_AGE': 300,
+}
 }
 
 
@@ -262,4 +271,30 @@ CKEDITOR_CONFIGS = {
         #     ]
         # ),
     }
+}
+
+# Celery
+# Celery Configuration
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', 'redis://redis:6379/0')  # Using service name from docker-compose
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'  # Or your preferred timezone
+
+# Optional: Store task results in Django database
+CELERY_RESULT_BACKEND = 'django-db'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    # 'add-every-30-seconds': {
+    #     'task': 'django-ecommerce.tasks.add',
+    #     'schedule': 30.0,
+    #     'args': (16, 16)
+    # },
+    # 'send-report-every-monday': {
+    #     'task': 'django-ecommerce.tasks.send_email_task',
+    #     'schedule': crontab(hour=7, minute=30, day_of_week=1),
+    # },
 }

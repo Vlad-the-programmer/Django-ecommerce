@@ -44,15 +44,6 @@ urlpatterns = [
 	# Update cart
 	path('update-cart/', views.update_cart, name='update-cart'),
 
-	# Wishlist page
-	path('wishlist/', views.wishlist_view, name='wishlist'),
-
-	# Add To Wishlist
-	path('add-to-wishlist/', views.add_to_wishlist, name='add-to-wishlist'),
-
-	# Remove From Wishlist
-	path('remove-from-wishlist/', views.remove_from_wishlist, name='remove-from-wishlist'),
-
 	# Contact
 	path('contact/', views.contact, name='contact'),
 

@@ -6,8 +6,7 @@ from django.db.models.signals import post_save
 
 # AllAuth
 from allauth.account.signals import user_signed_up, email_confirmed
-from allauth.account.models import EmailAddress, EmailConfirmation
-
+from .emails_handler import send_verification_email
 
 User = get_user_model()
 
@@ -26,15 +25,18 @@ def save_user_profile(sender, created, instance, *args, **kwargs):
 def user_signed_up_(request, user, **kwargs):
     user.is_active = False
     print('u', user)
-    # Group.objects.get(name='BlogManager').user_set.add(user)
-
     user.save()
     
-    email_address = EmailAddress.objects.get_for_user(user, user.email)
-    # Sending confirmation
-    confirmation=EmailConfirmation.create(email_address)
-    confirmation.send(request, signup=True)
+    # send_confirmation_email.delay(request, user)
     
+    # Sending email activation
+    mail_subject = 'Please activate your account'
+    template_email = 'accounts/account_verification_email.html'
+    send_verification_email.delay(request,
+                            user,
+                            template_email,
+                            mail_subject,
+                            is_activation_email=True)
     messages.add_message(
         request, 
         messages.INFO,
@@ -42,12 +44,12 @@ def user_signed_up_(request, user, **kwargs):
     )
      
      
-@receiver(email_confirmed)
-def email_confirmed_(request, email_address, *args, **kwargs):
-    user = User.objects.get(
-        email=email_address.email)
-    user.is_active = True
-    user.save()
+# @receiver(email_confirmed)
+# def email_confirmed_(request, email_address, *args, **kwargs):
+#     user = User.objects.get(
+#         email=email_address.email)
+#     user.is_active = True
+#     user.save()
     
     
 # @receiver(post_save, sender=User)

@@ -10,7 +10,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.contrib import messages
 
+# AllAuth
+from allauth.account.models import EmailAddress, EmailConfirmation
+from celery import shared_task
 
+@shared_task
 def send_verification_email(request, user, template_email,
                             mail_subject=None, is_activation_email=False):
     
@@ -35,5 +39,9 @@ def send_verification_email(request, user, template_email,
         messages.success(request, f'Thank you. We have sent you an email with the instructions to your email address {to_email}. Please check it.')
         return redirect(reverse_lazy(settings.LOGIN_URL))
 
-    
-    
+# @shared_task   
+# def send_confirmation_email(request, user):
+#     email_address = EmailAddress.objects.get_for_user(user, user.email)
+#     # Sending confirmation
+#     confirmation=EmailConfirmation.create(email_address)
+#     confirmation.send(request, signup=True)

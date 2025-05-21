@@ -34,15 +34,6 @@ def register_view(request):
 				return redirect(reverse_lazy(settings.LOGIN_URL))
 			
 			user.save()
-			
-			# Sending email activation
-			mail_subject = 'Please activate your account'
-			template_email = 'accounts/account_verification_email.html'
-			send_verification_email(request,
-									user,
-									template_email,
-									mail_subject,
-									is_activation_email=True)
 		else:
 			messages.error(request, f'{form.errors}')
 			return redirect(reverse_lazy('userauths:sign-up'))
