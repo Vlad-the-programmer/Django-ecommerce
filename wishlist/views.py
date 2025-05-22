@@ -16,7 +16,7 @@ def wishlist_view(request):
 	context = {
 		'wishlist': wishlist
 	}
-	return render(request, 'core/wishlist.html', context)
+	return render(request, 'wishlist/wishlist.html', context)
 
 @login_required
 def add_to_wishlist(request):
@@ -56,5 +56,5 @@ def remove_from_wishlist(request):
 		'wishlist': wishlist
 	}
 	qs_json = serializers.serialize('json', wishlist)
-	data = render_to_string('core/async/wishlist-list.html', context)
+	data = render_to_string('wishlist/async/wishlist-list.html', context)
 	return JsonResponse({'data': data, 'wishlist': qs_json})

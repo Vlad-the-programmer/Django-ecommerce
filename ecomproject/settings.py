@@ -33,6 +33,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,11 +57,17 @@ INSTALLED_APPS = [
     'django_celery_beat',
     
     # Custom Apps
+    # Common things for all app
+    'common',
+    
     'core',
     'userauths',
     'blog',
     'order',
     'wishlist',
+    'product',
+    'category',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +107,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ecomproject.wsgi.application'
+ASGI_APPLICATION = 'ecomproject.asgi.application'
 
 
 # Database

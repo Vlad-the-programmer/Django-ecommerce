@@ -11,6 +11,7 @@ then
     echo "PostgreSQL started"
 fi
 
+python manage.py makemigartions
 python manage.py migrate
 python manage.py collectstatic --noinput
 

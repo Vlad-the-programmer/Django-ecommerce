@@ -25,12 +25,13 @@ typing_extensions = "4.13.2"
 tzdata = "2025.2"
 django-allauth = {extras = ["socialaccount"], version = "^65.8.0"}
 django-countries = "^7.6.1"
-celery = "5.3.6"
+celery = "^5.5.2"
 redis = "4.6.0"
 django-celery-results = "^2.6.0" 
 django-celery-beat = "^2.8.1"   
 psycopg2-binary = "^2.9.10"
 gunicorn = "^23.0.0"
+daphne = "^4.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.12.0"

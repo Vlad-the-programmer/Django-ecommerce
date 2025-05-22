@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.html import mark_safe
 from userauths.models import User
 from django.utils.translation import gettext_lazy as _
+from common import models as common_models
 
 class OrderStatus(models.TextChoices):
     PENDING = "pending", _("Pending")
@@ -23,15 +24,15 @@ class DeliveryMethod(models.TextChoices):
     PICKUP = "pickup", _("Store Pickup")
     
     
-class Order(models.Model):
+class Order(common_models.TimeStampedUUIDModel):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	status = models.CharField(choices=OrderStatus.choices, max_length=30, default=OrderStatus.PENDING)
+	orderStatus = models.CharField(choices=OrderStatus.choices, max_length=30, default=OrderStatus.PENDING)
 	payment_method = models.CharField(choices=PaymentMethod.choices, max_length=30, default=PaymentMethod.CREDIT_CARD)
 	delivery_method = models.CharField(choices=DeliveryMethod.choices, max_length=30, default=DeliveryMethod.STANDARD)
 	total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1.99)
-	is_paid = models.BooleanField(default=False)
+	isPaid = models.BooleanField(default=False)
 	order_date = models.DateTimeField(auto_now_add=True)
-	orderItems = models.ManyToManyField("core.Product", through="OrderItem")
+	orderItems = models.ManyToManyField("product.Product", through="OrderItem")
  
 	class Meta:
 		verbose_name_plural = "Orders"
@@ -40,9 +41,9 @@ class Order(models.Model):
 		return f"Order #{self.id} - {self.user}"
 
 
-class OrderItem(models.Model):
+class OrderItem(common_models.TimeStampedUUIDModel):
 	order = models.ForeignKey(Order, on_delete=models.CASCADE)
-	product = models.ForeignKey("core.Product", on_delete=models.CASCADE)
+	product = models.ForeignKey("product.Product", on_delete=models.CASCADE)
 	quantity = models.PositiveIntegerField(default=1)
 	price = models.DecimalField(max_digits=10, decimal_places=2)
  

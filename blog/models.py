@@ -1,19 +1,25 @@
 from django.db import models
 from django.utils.html import mark_safe
-from userauths.models import User
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 from shortuuid.django_fields import ShortUUIDField
+from common import models as common_models
+import uuid
 
-STATUS = (
-	("draft", "Draft"),
-	("disabled", "Disabled"),
-	("rejected", "Rejected"),
-	("in_review", "In Review"),
-	("published", "Published"),
-)
+User = get_user_model()
 
-class Category(models.Model):
+
+class PostStatus(models.TextChoices):
+	DRAFT = "draft", _("Draft"),
+	DISABLED= "disabled", _("Disabled"),
+	REJECTED = "rejected", _("Rejected"),
+	IN_REVIEW = "in_review", _("In Review"),
+	PUBLISHED = "published", _("Published"),
+    
+    
+class PostCategory(common_models.TimeStampedUUIDModel):
 	cid = ShortUUIDField(unique=True, length=10, max_length=30, prefix='cat', alphabet='abcdefgh12345')
 	title = models.CharField(max_length=100, default="Category Name")
 
@@ -23,11 +29,10 @@ class Category(models.Model):
 	def __str__(self):
 		return self.title
 
-class Post(models.Model):
-	pid = ShortUUIDField(unique=True, length=10, max_length=30, alphabet='abcdefgh12345')
-
+class Post(common_models.TimeStampedUUIDModel):
+	id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
 	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	categories = models.ManyToManyField(Category, related_name="categories")
+	categories = models.ManyToManyField(PostCategory, related_name="categories")
 
 	tags = TaggableManager(blank=True)
 
@@ -37,9 +42,7 @@ class Post(models.Model):
 	
 	body = RichTextUploadingField(null=True, blank=True, default="Post Body")
 
-	post_status = models.CharField(choices=STATUS, max_length=10, default="in_review")
-	date_created = models.DateTimeField(auto_now_add=True)
-	date_updated = models.DateTimeField(auto_now=True)
+	post_status = models.CharField(choices=PostStatus, max_length=10, default=PostStatus.IN_REVIEW)
 
 	class Meta:
 		verbose_name_plural = 'Posts'
@@ -50,11 +53,10 @@ class Post(models.Model):
 	def __str__(self):
 		return self.title
 
-class Comment(models.Model):
+class Comment(common_models.TimeStampedUUIDModel):
 	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
 	body = models.TextField()
-	date_created = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		verbose_name_plural = 'Comments'

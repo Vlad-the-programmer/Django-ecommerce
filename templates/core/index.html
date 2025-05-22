@@ -1,6 +1,5 @@
-{% extends '../base.html' %} 
-{% load static %} {% block title %}Valleys | Homepage{% endblock title %}
- {% block content %}
+{% extends '../base.html' %} {% load static %} {% block title %}Valleys |
+Homepage{% endblock title %} {% block content %}
 
 <!-- Hero Section Begin -->
 <section class="hero">
@@ -15,7 +14,7 @@
           <ul>
             {% for c in categories %}
             <li>
-              <a href="{% url 'core:category-product-list' c.cid %}">
+              <a href="{% url 'category:category-product-list' c.cid %}">
                 {{ c.title }}
               </a>
             </li>
@@ -26,7 +25,7 @@
       <div class="col-lg-9">
         <div class="hero__search">
           <div class="hero__search__form">
-            <form action="{% url 'core:search' %}" method="GET">
+            <form action="{% url 'product:search' %}" method="GET">
               <!-- <div class="hero__search__categories">
                                 All Categories
                                 <span class="arrow_carrot-down"></span>
@@ -54,7 +53,7 @@
             <span>FRUIT FRESH</span>
             <h2>Vegetable <br />100% Organic</h2>
             <p>Free Pickup and Delivery Available</p>
-            <a href="{% url 'core:products-list' %}" class="primary-btn"
+            <a href="{% url 'product:products-list' %}" class="primary-btn"
               >SHOP NOW</a
             >
           </div>
@@ -74,7 +73,7 @@
         <div class="col-lg-3">
           <div class="categories__item set-bg" data-setbg="{{ c.image.url }}">
             <h5>
-              <a href="{% url 'core:category-product-list' c.cid %}"
+              <a href="{% url 'category:category-product-list' c.cid %}"
                 >{{ c.title }}</a
               >
             </h5>
@@ -110,7 +109,7 @@
       {% for p in products %} {% if p.get_percentage > 0 %}
       <div class="col-lg-3 col-md-4 col-sm-6 mix {{ p.category.title }}">
         <div class="main__product__item">
-          <a href="{% url 'core:products-detail' p.pid %}">
+          <a href="{% url 'product:products-detail' p.pid %}">
             <div
               class="main__product__item__pic set-bg"
               data-setbg="{{ p.image.url }}"
@@ -133,7 +132,9 @@
           <div class="main__product__item__text">
             <span>{{ p.category.title }}</span>
             <h5>
-              <a href="{% url 'core:products-detail' p.pid %}">{{ p.title }}</a>
+              <a href="{% url 'product:products-detail' p.pid %}"
+                >{{ p.title }}</a
+              >
             </h5>
             <span style="display: none" class="current-product-price-{{ p.id }}"
               >{{ p.price }}</span
@@ -149,7 +150,7 @@
 
       <div class="col-lg-3 col-md-4 col-sm-6 mix {{ p.category.title }}">
         <div class="main__product__item">
-          <a href="{% url 'core:products-detail' p.pid %}">
+          <a href="{% url 'product:products-detail' p.pid %}">
             <div
               class="main__product__item__pic set-bg"
               data-setbg="{{ p.image.url }}"
@@ -169,7 +170,9 @@
           <div class="main__product__item__text">
             <span>{{ p.category.title }}</span>
             <h5>
-              <a href="{% url 'core:products-detail' p.pid %}">{{ p.title }}</a>
+              <a href="{% url 'product:products-detail' p.pid %}"
+                >{{ p.title }}</a
+              >
             </h5>
             <span style="display: none" class="current-product-price-{{ p.id }}"
               >{{ p.price }}</span
@@ -214,7 +217,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in latest_products|slice:":3" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -235,7 +238,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in latest_products|slice:"3:6" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -256,7 +259,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in latest_products|slice:"6:9" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -284,7 +287,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in oldest_products|slice:":3" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -305,7 +308,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in oldest_products|slice:"3:6" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -326,7 +329,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in oldest_products|slice:"6:9" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -354,7 +357,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in special_offers|slice:":3" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -371,7 +374,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in special_offers|slice:"3:6" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">
@@ -388,7 +391,7 @@
             <div class="latest-prdouct__slider__item">
               {% for p in special_offers|slice:"6:9" %}
               <a
-                href="{% url 'core:products-detail' p.pid %}"
+                href="{% url 'product:products-detail' p.pid %}"
                 class="latest-product__item"
               >
                 <div class="latest-product__item__pic">

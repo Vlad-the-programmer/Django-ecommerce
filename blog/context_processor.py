@@ -4,7 +4,7 @@ from taggit.models import Tag
 
 def blog_context(request):
 
-	blog_categories = Category.objects.all()
+	blog_categories = Category.objects.filter(IsActive=True)
 
 	all_blog_tags = Tag.objects.filter(post__isnull=False).distinct()
 	random_blog_tags = random.sample(list(all_blog_tags), min(6, len(all_blog_tags)))
